@@ -18,6 +18,8 @@
         <maven.checkstyle.plugin.version>3.1.2</maven.checkstyle.plugin.version>
         <jacoco.version>0.8.7</jacoco.version>
         <minio.version>8.3.4</minio.version>
+        <okhttp3.version>4.9.3</okhttp3.version>
+        <commons.validator.version>1.7</commons.validator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -44,6 +46,16 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${commons.validator.version}</version>
         </dependency>
 
     </dependencies>
