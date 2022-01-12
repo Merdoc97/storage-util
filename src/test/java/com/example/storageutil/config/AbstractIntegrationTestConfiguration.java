@@ -7,9 +7,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.ResourceUtils;
 import org.testcontainers.containers.DockerComposeContainer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import java.util.Map;
 public abstract class AbstractIntegrationTestConfiguration {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        private DockerComposeContainer<?> minioContainer = new DockerComposeContainer(ResourceUtils.getFile("classpath:docker-compose.yml"))
+        private DockerComposeContainer<?> minioContainer = new DockerComposeContainer(new File(this.getClass().getResource("/docker-compose.yml").getFile()))
                 .withEnv("MINIO_ROOT_USER", "admin")
                 .withEnv("MINIO_ROOT_PASSWORD", "password");
 
