@@ -1,6 +1,8 @@
 package com.example.storageutil;
 
+import com.example.storageutil.dto.DownloadObjectResponse;
 import com.example.storageutil.dto.UploadFileResponse;
+import org.springframework.core.io.InputStreamResource;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -11,4 +13,6 @@ public interface StorageService {
                                   Map<String, String> metadata, InputStream inputStream, boolean allowToOverride);
 
     boolean isFilePresent(String username, String pathToStore, String fileName);
+
+    DownloadObjectResponse downloadFile(String username, String path, String fileName);
 }

@@ -1,6 +1,7 @@
 package com.example.storageutil;
 
 import com.example.storageutil.config.AbstractIntegrationTestConfiguration;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Random;
 
@@ -24,6 +29,7 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
     private String pathToStore = "/images";
     private String fileName;
     private File testFile = new File(this.getClass().getResource("/test.png").getFile());
+    private String headerPrefix = "x-amz-meta-";
 
     @BeforeEach
     void setUp() {
@@ -48,13 +54,33 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
     @Test
     void uploadFileIfOverrideNotAllowed() throws FileNotFoundException {
         //create file for current test
-        var response = storageService.uploadFile(userName, pathToStore, fileName,
+        storageService.uploadFile(userName, pathToStore, fileName,
                 "application/png", Map.of("version", "1"), new FileInputStream(testFile), true);
         var message = Assertions.assertThrows(IllegalArgumentException.class, () -> storageService.uploadFile(userName, pathToStore, fileName,
                         "application/png", Map.of("version", "1"), new FileInputStream(testFile), false))
                 .getMessage();
         assertThat(message).isEqualTo(String.format("File with path store %s and with file name %s already present and allowToOverride param is false",
                 pathToStore, fileName));
+    }
+
+    @Test
+    void testDownloadOperations() throws IOException {
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
+        var response = storageService.uploadFile(userName, pathToStore, fileName,
+                "application/png", Map.of("application-version", "1"), new FileInputStream(testFile), true);
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isTrue();
+        var fileToSave = new File(testFile.getParentFile() + "/copy-" + fileName);
+        if (!fileToSave.exists()) {
+            fileToSave.createNewFile();
+        }
+        var is = storageService.downloadFile(userName, pathToStore, fileName);
+        IOUtils.copy(is.getInputStream(), new FileOutputStream(fileToSave));
+        IOUtils.closeQuietly(is.getInputStream());
+        var initFile = new String(Files.readAllBytes(testFile.toPath()), StandardCharsets.UTF_8);
+        var savedFile = new String(Files.readAllBytes(fileToSave.toPath()), StandardCharsets.UTF_8);
+        assertThat(savedFile).isEqualTo(initFile);
+        assertThat(is.getHeaders().get(headerPrefix + "application-version")).isEqualTo("1");
+        assertThat(is.getHeaders().get("content-type")).isEqualTo("application/png");
     }
 
 }

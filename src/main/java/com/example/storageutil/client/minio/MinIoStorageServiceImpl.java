@@ -1,9 +1,12 @@
 package com.example.storageutil.client.minio;
 
 import com.example.storageutil.StorageService;
+import com.example.storageutil.dto.DownloadObjectResponse;
 import com.example.storageutil.dto.UploadFileResponse;
+import com.example.storageutil.exceptions.FileNotFoundException;
 import com.example.storageutil.util.PathUtil;
 import io.minio.BucketExistsArgs;
+import io.minio.GetObjectArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import lombok.SneakyThrows;
@@ -62,6 +65,21 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     @Override
     public boolean isFilePresent(String username, String pathToStore, String fileName) {
         return uploadOperations.isFilePresent(PathUtil.buildFullPath(username, pathToStore, fileName));
+    }
+
+    @Override
+    @SneakyThrows
+    public DownloadObjectResponse downloadFile(String username, String path, String fileName) {
+        if (!isFilePresent(username, path, fileName)) {
+            throw new FileNotFoundException("Searching file %s not found");
+        }
+
+        var minioResponse = minioClient.getObject(GetObjectArgs.builder()
+                .bucket(bucket)
+                .object(PathUtil.buildFullPath(username, path, fileName))
+                .build());
+        return DownloadObjectResponse.of(minioResponse, minioResponse.headers());
+
     }
 
     @SneakyThrows
