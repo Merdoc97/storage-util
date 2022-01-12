@@ -71,9 +71,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>1.5.12.RELEASE</version>
                 <configuration>
-                    <layout>MODULE</layout>
+                    <layout>NONE</layout>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
