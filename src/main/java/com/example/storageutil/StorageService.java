@@ -2,7 +2,6 @@ package com.example.storageutil;
 
 import com.example.storageutil.dto.DownloadObjectResponse;
 import com.example.storageutil.dto.UploadFileResponse;
-import org.springframework.core.io.InputStreamResource;
 
 import java.io.InputStream;
 import java.util.Map;
