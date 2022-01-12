@@ -3,7 +3,10 @@ package com.example.storageutil.client.minio;
 import com.example.storageutil.StorageService;
 import com.example.storageutil.dto.UploadFileResponse;
 import com.example.storageutil.util.PathUtil;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.InitializingBean;
@@ -61,6 +64,7 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
         return uploadOperations.isFilePresent(PathUtil.buildFullPath(username, pathToStore, fileName));
     }
 
+    @SneakyThrows
     @Override
     public void afterPropertiesSet() {
         log.info("Validate Storage implementation input params");
@@ -78,6 +82,13 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
         }
         if (bucket == null || bucket.isEmpty()) {
             throw new IllegalArgumentException("Storage bucket is empty or null");
+        }
+        if (!this.minioClient.bucketExists(BucketExistsArgs.builder()
+                .bucket(bucket).build())) {
+            log.info("Create bucket which not exist: {}", this.bucket);
+            minioClient.makeBucket(MakeBucketArgs.builder()
+                    .bucket(this.bucket)
+                    .build());
         }
     }
 }

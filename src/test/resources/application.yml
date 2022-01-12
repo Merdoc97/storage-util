@@ -1,0 +1,6 @@
+minio:
+  port: 9000
+  url: http://localhost
+  user: admin
+  password: password
+  bucket: test-bucket

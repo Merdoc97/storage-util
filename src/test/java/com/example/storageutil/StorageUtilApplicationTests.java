@@ -1,10 +1,11 @@
 package com.example.storageutil;
 
-import com.example.storageutil.client.minio.MinIoStorageServiceImpl;
+import com.example.storageutil.config.AbstractIntegrationTestConfiguration;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,10 +16,10 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("checkstyle:MagicNumber")
-class StorageUtilApplicationTests {
+class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
 
-    private MinIoStorageServiceImpl storageService = new MinIoStorageServiceImpl("http://localhost", 9002, false,
-            "admin", "password", "test-bucket", null, null);
+    @Autowired
+    private StorageService storageService;
     private String userName = "testUser";
     private String pathToStore = "/images";
     private String fileName;

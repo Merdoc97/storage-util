@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  minio:
+    image: docker.io/bitnami/minio:2022
+    ports:
+      - '9006:9000'
+      - '9007:9001'
+    environment:
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: password
