@@ -21,7 +21,7 @@ import java.util.Map;
 public abstract class AbstractIntegrationTestConfiguration {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        private DockerComposeContainer<?> minioContainer = new DockerComposeContainer(ResourceUtils.getFile("classpath:./docker-compose.yml"))
+        private DockerComposeContainer<?> minioContainer = new DockerComposeContainer(ResourceUtils.getFile("classpath:docker-compose.yml"))
                 .withEnv("MINIO_ROOT_USER", "admin")
                 .withEnv("MINIO_ROOT_PASSWORD", "password");
 
