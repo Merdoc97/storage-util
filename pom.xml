@@ -22,6 +22,18 @@
         <commons.validator.version>1.7</commons.validator.version>
         <testconteainers.version>1.16.2</testconteainers.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>http://nexus-nexus-repository-manager:8082/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://nexus-nexus-repository-manager:8082/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
