@@ -11,7 +11,6 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.InputStream;
@@ -86,9 +85,6 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     @Override
     public void afterPropertiesSet() {
         log.info("Validate Storage implementation input params");
-        if (!UrlValidator.getInstance().isValid(minioUrl)) {
-            throw new IllegalArgumentException("Storage url not valid " + minioUrl);
-        }
         if (minioPort == null) {
             throw new IllegalArgumentException("Storage port is null please verify configuration");
         }
