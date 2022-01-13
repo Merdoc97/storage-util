@@ -25,7 +25,7 @@ public abstract class AbstractIntegrationTestConfiguration {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         private DockerComposeContainer<?> minioContainer =
-                new DockerComposeContainer(new ClassPathResource("/docker-compose.yml").getFile())
+                new DockerComposeContainer(new ClassPathResource("/docker-compose.yml", this.getClass().getClassLoader()).getFile())
                         .withEnv("MINIO_ROOT_USER", "admin")
                         .withEnv("MINIO_ROOT_PASSWORD", "password");
 
