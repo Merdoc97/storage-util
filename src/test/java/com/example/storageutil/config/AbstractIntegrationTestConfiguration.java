@@ -34,7 +34,7 @@ public abstract class AbstractIntegrationTestConfiguration {
 
         public Map<String, Object> getProperties() throws InterruptedException {
             minioContainer.start();
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(10);
             return Map.of(
                     "minio.url", "http://127.0.0.1",
                     "minio.port", minioContainer.getMappedPort(9000),
