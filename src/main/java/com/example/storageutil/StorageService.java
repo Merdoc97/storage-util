@@ -14,4 +14,6 @@ public interface StorageService {
     boolean isFilePresent(String username, String pathToStore, String fileName);
 
     DownloadObjectResponse downloadFile(String username, String path, String fileName);
+
+    void deleteFile(String username, String path, String fileName);
 }

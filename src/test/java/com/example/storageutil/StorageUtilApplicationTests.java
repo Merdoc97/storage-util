@@ -83,4 +83,13 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
         assertThat(is.getHeaders().get("content-type")).isEqualTo("application/png");
     }
 
+    @Test
+    void deleteFileTest() throws FileNotFoundException {
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
+        var response = storageService.uploadFile(userName, pathToStore, fileName,
+                "application/png", Map.of("application-version", "1"), new FileInputStream(testFile), true);
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isTrue();
+        storageService.deleteFile(userName, pathToStore, fileName);
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
+    }
 }

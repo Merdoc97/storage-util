@@ -9,6 +9,7 @@ import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import io.minio.RemoveObjectArgs;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,7 +22,6 @@ import static io.minio.ObjectWriteArgs.MIN_MULTIPART_SIZE;
 @Slf4j
 public class MinIoStorageServiceImpl implements StorageService, InitializingBean {
 
-    private final String minioUrl;
     private final Integer minioPort;
     private final String accessKey;
     private final String secretKey;
@@ -35,7 +35,6 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
                                    final boolean secure, final String accessKey,
                                    final String secretKey, final String bucket,
                                    final Integer fileSize, final Long maxMultipartSize) {
-        this.minioUrl = minioUrl;
         this.minioPort = minioPort;
         this.accessKey = accessKey;
         this.secretKey = secretKey;
@@ -79,6 +78,15 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
                 .build());
         return DownloadObjectResponse.of(minioResponse, minioResponse.headers());
 
+    }
+
+    @Override
+    @SneakyThrows
+    public void deleteFile(String username, String path, String fileName) {
+        minioClient.removeObject(RemoveObjectArgs.builder()
+                .bucket(bucket)
+                .object(PathUtil.buildFullPath(username, path, fileName))
+                .build());
     }
 
     @SneakyThrows
