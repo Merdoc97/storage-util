@@ -35,10 +35,10 @@ public abstract class AbstractIntegrationTestConfiguration {
         public Map<String, Object> getProperties() throws InterruptedException {
             minioContainer.start();
             return Map.of(
-                    "minio.url", "http://" + minioContainer.getContainerIpAddress(),
-                    "minio.port", minioContainer.getMappedPort(9000),
-                    "minio.user", "admin",
-                    "minio.password", "password");
+                    "storage.minio.url", "http://" + minioContainer.getContainerIpAddress(),
+                    "storage.minio.port", minioContainer.getMappedPort(9000),
+                    "storage.minio.user", "admin",
+                    "storage.minio.password", "password");
         }
 
         @SneakyThrows

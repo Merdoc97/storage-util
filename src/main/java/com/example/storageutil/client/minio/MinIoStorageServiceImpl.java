@@ -1,6 +1,7 @@
 package com.example.storageutil.client.minio;
 
 import com.example.storageutil.StorageService;
+import com.example.storageutil.config.MinioAdapterConfigProperties;
 import com.example.storageutil.dto.DownloadObjectResponse;
 import com.example.storageutil.dto.UploadFileResponse;
 import com.example.storageutil.exceptions.FileNotFoundException;
@@ -17,8 +18,6 @@ import org.springframework.beans.factory.InitializingBean;
 import java.io.InputStream;
 import java.util.Map;
 
-import static io.minio.ObjectWriteArgs.MIN_MULTIPART_SIZE;
-
 @Slf4j
 public class MinIoStorageServiceImpl implements StorageService, InitializingBean {
 
@@ -31,20 +30,17 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     private final int fileSize;
     private final long maxMultipartSize;
 
-    public MinIoStorageServiceImpl(final String minioUrl, final Integer minioPort,
-                                   final boolean secure, final String accessKey,
-                                   final String secretKey, final String bucket,
-                                   final Integer fileSize, final Long maxMultipartSize) {
-        this.minioPort = minioPort;
-        this.accessKey = accessKey;
-        this.secretKey = secretKey;
-        this.bucket = bucket;
+    public MinIoStorageServiceImpl(final MinioAdapterConfigProperties minioProperties) {
+        this.minioPort = minioProperties.getPort();
+        this.accessKey = minioProperties.getUser();
+        this.secretKey = minioProperties.getPassword();
+        this.bucket = minioProperties.getBucket();
         this.minioClient = MinioClient.builder()
                 .credentials(accessKey, secretKey)
-                .endpoint(minioUrl, minioPort, secure)
+                .endpoint(minioProperties.getUrl(), minioPort, minioProperties.isSecure())
                 .build();
-        this.fileSize = fileSize == null ? -1 : fileSize;
-        this.maxMultipartSize = maxMultipartSize == null ? MIN_MULTIPART_SIZE : maxMultipartSize;
+        this.fileSize = minioProperties.getFileSize();
+        this.maxMultipartSize = minioProperties.getMaxMultipartSize();
         this.uploadOperations = MinioUploadOperations.builder()
                 .minioClient(this.minioClient)
                 .bucket(this.bucket)
@@ -93,18 +89,6 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     @Override
     public void afterPropertiesSet() {
         log.info("Validate Storage implementation input params");
-        if (minioPort == null) {
-            throw new IllegalArgumentException("Storage port is null please verify configuration");
-        }
-        if (secretKey == null || secretKey.isEmpty()) {
-            throw new IllegalArgumentException("Storage secret key is null or empty");
-        }
-        if (accessKey == null || accessKey.isEmpty()) {
-            throw new IllegalArgumentException("Storage access key is null or empty");
-        }
-        if (bucket == null || bucket.isEmpty()) {
-            throw new IllegalArgumentException("Storage bucket is empty or null");
-        }
         if (!this.minioClient.bucketExists(BucketExistsArgs.builder()
                 .bucket(bucket).build())) {
             log.info("Create bucket which not exist: {}", this.bucket);

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +21,10 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings("checkstyle:MagicNumber")
+@TestPropertySource(properties = {
+        "storage.minio.enabled=true",
+        "storage,minio.bucket=test-bucket"})
+@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:Indentation"})
 class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
 
     @Autowired
@@ -54,13 +58,15 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
     @Test
     void uploadFileIfOverrideNotAllowed() throws FileNotFoundException {
         //create file for current test
+        var is = new FileInputStream(testFile);
+        var metaData = Map.of("version", "1");
         storageService.uploadFile(userName, pathToStore, fileName,
                 "application/png", Map.of("version", "1"), new FileInputStream(testFile), true);
         var message = Assertions.assertThrows(IllegalArgumentException.class, () -> storageService.uploadFile(userName, pathToStore, fileName,
-                        "application/png", Map.of("version", "1"), new FileInputStream(testFile), false))
-                .getMessage();
-        assertThat(message).isEqualTo(String.format("File with path store %s and with file name %s already present and allowToOverride param is false",
-                pathToStore, fileName));
+                "application/png", metaData, is, false));
+        assertThat(message.getMessage()).isEqualTo(
+                String.format("File with path store %s and with file name %s already present and allowToOverride param is false",
+                        pathToStore, fileName));
     }
 
     @Test
