@@ -17,6 +17,6 @@ public class PathUtil {
     }
 
     private String replace(String s) {
-        return s.replaceAll("/", Strings.EMPTY);
+        return s.replace("/", Strings.EMPTY);
     }
 }
