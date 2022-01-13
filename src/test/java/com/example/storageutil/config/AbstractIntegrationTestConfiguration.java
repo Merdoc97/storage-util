@@ -6,10 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.GenericContainer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,10 +23,11 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractIntegrationTestConfiguration {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        private DockerComposeContainer<?> minioContainer =
-                new DockerComposeContainer(new ClassPathResource("/docker-compose.yml", this.getClass().getClassLoader()).getFile())
+        private GenericContainer<?> minioContainer =
+                new GenericContainer<>("docker.io/bitnami/minio:2022")
                         .withEnv("MINIO_ROOT_USER", "admin")
-                        .withEnv("MINIO_ROOT_PASSWORD", "password");
+                        .withEnv("MINIO_ROOT_PASSWORD", "password")
+                        .withExposedPorts(9000);
 
         public Initializer() throws IOException, URISyntaxException, InterruptedException {
         }
@@ -37,7 +37,7 @@ public abstract class AbstractIntegrationTestConfiguration {
             TimeUnit.SECONDS.sleep(1);
             return Map.of(
                     "minio.url", "http://127.0.0.1",
-                    "minio.port", 9006,
+                    "minio.port", minioContainer.getMappedPort(9000),
                     "minio.user", "admin",
                     "minio.password", "password");
         }
