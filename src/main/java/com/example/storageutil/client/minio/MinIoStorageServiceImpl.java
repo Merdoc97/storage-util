@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 @Slf4j
+@SuppressWarnings("checkstyle:LineLength")
 public class MinIoStorageServiceImpl implements StorageService, InitializingBean {
     private static final String PUBLIC_POLICY_CONFIGURATION =
             "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\",\"s3:ListBucketMultipartUploads\"],\"Resource\":[\"arn:aws:s3:::test-bucket\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:AbortMultipartUpload\",\"s3:DeleteObject\",\"s3:GetObject\",\"s3:ListMultipartUploadParts\",\"s3:PutObject\"],\"Resource\":[\"arn:aws:s3:::%s/*\"]}]}";
@@ -32,6 +33,7 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     private final int fileSize;
     private final long maxMultipartSize;
     private final MinioAdapterConfigProperties properties;
+
     public MinIoStorageServiceImpl(final MinioAdapterConfigProperties minioProperties) {
         this.minioPort = minioProperties.getPort();
         this.accessKey = minioProperties.getUser();
@@ -49,7 +51,7 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
                 .fileSize(this.fileSize)
                 .maxMultipartSize(this.maxMultipartSize)
                 .build();
-        this.properties=minioProperties;
+        this.properties = minioProperties;
     }
 
     @Override
