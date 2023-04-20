@@ -5,8 +5,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import static io.minio.ObjectWriteArgs.MIN_MULTIPART_SIZE;
 
@@ -38,4 +38,5 @@ public class MinioAdapterConfigProperties {
     private Long maxMultipartSize = (long) MIN_MULTIPART_SIZE;
 
     private boolean secure;
+    private boolean bucketPublic;
 }

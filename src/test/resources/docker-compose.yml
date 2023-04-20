@@ -7,5 +7,5 @@ services:
       - '9006:9000'
       - '9007:9001'
     environment:
-      MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: password
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password

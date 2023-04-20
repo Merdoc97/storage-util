@@ -11,6 +11,7 @@ import io.minio.GetObjectArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
+import io.minio.SetBucketPolicyArgs;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,7 +21,8 @@ import java.util.Map;
 
 @Slf4j
 public class MinIoStorageServiceImpl implements StorageService, InitializingBean {
-
+    private static final String PUBLIC_POLICY_CONFIGURATION =
+            "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\",\"s3:ListBucketMultipartUploads\"],\"Resource\":[\"arn:aws:s3:::test-bucket\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:AbortMultipartUpload\",\"s3:DeleteObject\",\"s3:GetObject\",\"s3:ListMultipartUploadParts\",\"s3:PutObject\"],\"Resource\":[\"arn:aws:s3:::%s/*\"]}]}";
     private final Integer minioPort;
     private final String accessKey;
     private final String secretKey;
@@ -29,7 +31,7 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
     private final MinioUploadOperations uploadOperations;
     private final int fileSize;
     private final long maxMultipartSize;
-
+    private final MinioAdapterConfigProperties properties;
     public MinIoStorageServiceImpl(final MinioAdapterConfigProperties minioProperties) {
         this.minioPort = minioProperties.getPort();
         this.accessKey = minioProperties.getUser();
@@ -47,6 +49,7 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
                 .fileSize(this.fileSize)
                 .maxMultipartSize(this.maxMultipartSize)
                 .build();
+        this.properties=minioProperties;
     }
 
     @Override
@@ -95,6 +98,12 @@ public class MinIoStorageServiceImpl implements StorageService, InitializingBean
             minioClient.makeBucket(MakeBucketArgs.builder()
                     .bucket(this.bucket)
                     .build());
+            if (properties.isBucketPublic()) {
+                minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+                        .bucket(bucket)
+                        .config(String.format(PUBLIC_POLICY_CONFIGURATION, bucket))
+                        .build());
+            }
         }
     }
 }

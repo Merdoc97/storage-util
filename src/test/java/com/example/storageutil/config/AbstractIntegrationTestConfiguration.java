@@ -26,7 +26,7 @@ public abstract class AbstractIntegrationTestConfiguration {
                 new GenericContainer<>("docker.io/bitnami/minio:2022")
                         .withEnv("MINIO_ROOT_USER", "admin")
                         .withEnv("MINIO_ROOT_PASSWORD", "password")
-                        .withExposedPorts(9000)
+                        .withExposedPorts(9000,9001)
                         .withStartupAttempts(3);
 
         public Initializer() throws IOException, URISyntaxException, InterruptedException {
