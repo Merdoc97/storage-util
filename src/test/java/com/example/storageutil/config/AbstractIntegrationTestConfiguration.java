@@ -20,8 +20,8 @@ import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ContextConfiguration(initializers = AbstractIntegrationTestConfiguration.Initializer.class)
-@SuppressWarnings("checkstyle:MagicNumber")
+//@ContextConfiguration(initializers = AbstractIntegrationTestConfiguration.Initializer.class)
+//@SuppressWarnings("checkstyle:MagicNumber")
 public abstract class AbstractIntegrationTestConfiguration {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

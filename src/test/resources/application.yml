@@ -1,10 +1,11 @@
 storage:
   minio:
-    port: 8087
+    enabled: true
+    port: 9006
     url: http://localhost
-    user: minioadmin
-    password: minioadmin
-    bucket: test-bucket
+    user: admin
+    password: password
+    bucket: testb
     secure: false
     max-multipart-size: 10000000
     bucket-public: true

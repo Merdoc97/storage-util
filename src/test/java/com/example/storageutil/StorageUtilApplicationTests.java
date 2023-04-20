@@ -108,14 +108,13 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
 
     @Test
     void uploadFileFromUrl() throws IOException {
-        var imageUrl = "https://images.idgesg.net/images/idge/imported/imageapi/2023/02/21/10/shutterstock_1481779412-100937709-large.jpg";
-        var image = ImageIO.read(new URL(imageUrl));
-        var imageBytes = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        var imageUrl = "https://v2.cimg.co/news/110843/268285/image4.jpg";
+        var stream = new BufferedInputStream(new URL(imageUrl).openStream());
         var imgTmp = imageUrl.split("\\.");
         var fileExtensions = imgTmp[imgTmp.length - 1];
         assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
         var response = storageService.uploadFile(userName, pathToStore, UUID.randomUUID() + "." + fileExtensions, "application/" + fileExtensions, Map.of(),
-                new BufferedInputStream(new ByteArrayInputStream(imageBytes)), true);
+                stream, true);
         assertThat(response).isNotNull();
         assertThat(response.getObjectPath()).isNotNull();
     }
