@@ -9,9 +9,12 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Map;
 
 
@@ -27,6 +30,11 @@ public abstract class AbstractIntegrationTestConfiguration {
                         .withEnv("MINIO_ROOT_USER", "admin")
                         .withEnv("MINIO_ROOT_PASSWORD", "password")
                         .withExposedPorts(9000, 9001)
+                        .waitingFor(new HttpWaitStrategy()
+                                .forPath("/login")
+                                .forPort(9001)
+                                .forStatusCode(200)
+                                .withStartupTimeout(Duration.ofMinutes(2)))
                         .withStartupAttempts(3);
 
         public Initializer() throws IOException, URISyntaxException, InterruptedException {

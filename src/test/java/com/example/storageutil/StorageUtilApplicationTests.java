@@ -9,15 +9,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.imageio.ImageIO;
+import java.awt.image.DataBufferByte;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -97,5 +104,19 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
         assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isTrue();
         storageService.deleteFile(userName, pathToStore, fileName);
         assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
+    }
+
+    @Test
+    void uploadFileFromUrl() throws IOException {
+        var imageUrl = "https://images.idgesg.net/images/idge/imported/imageapi/2023/02/21/10/shutterstock_1481779412-100937709-large.jpg";
+        var image = ImageIO.read(new URL(imageUrl));
+        var imageBytes = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        var imgTmp = imageUrl.split("\\.");
+        var fileExtensions = imgTmp[imgTmp.length - 1];
+        assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
+        var response = storageService.uploadFile(userName, pathToStore, UUID.randomUUID() + "." + fileExtensions, "application/" + fileExtensions, Map.of(),
+                new BufferedInputStream(new ByteArrayInputStream(imageBytes)), true);
+        assertThat(response).isNotNull();
+        assertThat(response.getObjectPath()).isNotNull();
     }
 }

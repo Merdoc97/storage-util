@@ -6,3 +6,5 @@ storage:
     password: minioadmin
     bucket: test-bucket
     secure: false
+    max-multipart-size: 10000000
+    bucket-public: true
