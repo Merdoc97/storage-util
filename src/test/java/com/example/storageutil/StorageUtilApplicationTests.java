@@ -3,6 +3,7 @@ package com.example.storageutil;
 import com.example.storageutil.config.AbstractIntegrationTestConfiguration;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.imgscalr.Scalr;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,7 +41,7 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
     @Autowired
     private StorageService storageService;
     private String userName = "testUser";
-    private String pathToStore = "/images";
+    private String pathToStore = "/test/images";
     private String fileName;
     private File testFile = new File(this.getClass().getResource("/test.png").getFile());
     private String headerPrefix = "x-amz-meta-";
@@ -108,14 +112,26 @@ class StorageUtilApplicationTests extends AbstractIntegrationTestConfiguration {
 
     @Test
     void uploadFileFromUrl() throws IOException {
-        var imageUrl = "https://v2.cimg.co/news/110843/268285/image4.jpg";
-        var stream = new BufferedInputStream(new URL(imageUrl).openStream());
-        var imgTmp = imageUrl.split("\\.");
+        var imageUrl =
+                "https://cdn.nba.com/manage/2023/04/draymond-game2-scaled.jpg";
+
+        var bfImage = ImageIO.read(new URL(imageUrl).openStream());
+        var resized  = Scalr.resize(bfImage, Scalr.Method.SPEED, bfImage.getWidth(), bfImage.getHeight());
+
+        var imgTmp = imageUrl.split("\\?")[0].split("\\.");
+
         var fileExtensions = imgTmp[imgTmp.length - 1];
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(resized, fileExtensions, baos);
+        byte[] bytes = baos.toByteArray();
+
         assertThat(storageService.isFilePresent(userName, pathToStore, fileName)).isFalse();
         var response = storageService.uploadFile(userName, pathToStore, UUID.randomUUID() + "." + fileExtensions, "application/" + fileExtensions, Map.of(),
-                stream, true);
+                new BufferedInputStream(new ByteArrayInputStream(bytes)), true);
         assertThat(response).isNotNull();
         assertThat(response.getObjectPath()).isNotNull();
     }
+
+
 }

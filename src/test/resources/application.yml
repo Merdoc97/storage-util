@@ -5,7 +5,7 @@ storage:
     url: http://localhost
     user: admin
     password: password
-    bucket: testb
+    bucket: world-news
     secure: false
     max-multipart-size: 10000000
     bucket-public: true
